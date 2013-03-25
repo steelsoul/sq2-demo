@@ -1,6 +1,6 @@
 package ua.luxoft.odessa.apushkar.sq2d.impl;
 
-import java.awt.Dimension;
+import java.awt.BorderLayout;
 
 import javax.swing.JFrame;
 
@@ -20,10 +20,17 @@ public class MainSq2D extends JFrame implements Runnable {
 	public void createGUI() {
 		mMainWindow = new JFrame("sq2 - demo");
 		mMainWindow.setDefaultCloseOperation(EXIT_ON_CLOSE);
-		mMainWindow.setPreferredSize(new Dimension(400, 300));
-		mMainWindow.add(mView);
+		
+		mMainWindow.setLayout(new BorderLayout(10, 5));	
+
+		mMainWindow.add(mView, BorderLayout.CENTER);
+		mView.createGUI();
+		
+		mMainWindow.add(mController, BorderLayout.WEST);
+		mController.createGUI();
+		
 		mMainWindow.pack();
-		mMainWindow.setResizable(false);
+		mMainWindow.setResizable(true);
 		mMainWindow.setVisible(true);		
 	}
 	

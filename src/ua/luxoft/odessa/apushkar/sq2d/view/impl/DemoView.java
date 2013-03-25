@@ -1,13 +1,14 @@
 package ua.luxoft.odessa.apushkar.sq2d.view.impl;
 
-import java.awt.Canvas;
-import java.awt.Graphics;
+
+import javax.swing.JPanel;
 
 import ua.luxoft.odessa.apushkar.sq2d.model.impl.DataModel;
 
-public class DemoView extends Canvas {
+public class DemoView extends JPanel {
 	
 	private static final long serialVersionUID = 1L;
+	private static DemoViewCanvas mCanvas;
 	private DataModel mModel;
 	private int mScaleX;
 	private int mScaleY;
@@ -17,15 +18,11 @@ public class DemoView extends Canvas {
 		mScaleX = mScaleY = 0;
 	}
 	
-	public void paint(Graphics g) {
-		// TODO: Calculate dimension scales
-//		mScaleX = getWidth() / mModel.get
+	public void createGUI() {
+		mCanvas = new DemoViewCanvas();
+		this.add(mCanvas);
+		mCanvas.setVisible(true);
 	}
-	
-	public void update(Graphics g) {
-		
-	}
-	
 	
 
 }
