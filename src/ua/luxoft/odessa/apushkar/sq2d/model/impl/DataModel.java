@@ -1,37 +1,41 @@
 package ua.luxoft.odessa.apushkar.sq2d.model.impl;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
-import java.util.Scanner;
+import java.awt.Point;
 import java.util.Vector;
 
 public class DataModel {
 	private Vector<DataSet> mData;
 	
-	public DataModel(String filename) {
-		if (!filename.isEmpty())
-			try {
-				FileReader reader = new FileReader(filename);
-				BufferedReader buffer = new BufferedReader(reader);
-				Scanner scanner = new Scanner(buffer);
-
-				if (scanner.nextInt() > 0)
-				while (new Scanner(buffer).hasNext()) {
-					DataSet tempDS = new DataSet();
-					
-					int pointsN = scanner.nextInt();
-					tempDS.setSquaresN(scanner.nextInt());
-					for (int i = 0; (i < pointsN) && scanner.hasNext(); i++)
-						tempDS.addPoint(scanner.nextInt(), scanner.nextInt());
-					
-					mData.add(tempDS);
-				}
-				scanner.close();
-			}
-			catch (IOException ex) {
-				ex.printStackTrace();
-			}
+	public DataModel() {
+		mData = new Vector<DataSet>(0); 
+	}
+	
+	public void add(DataSet s) {
+		mData.add(s);
+	}
+	
+	public int getCaseN() {
+		return mData.size();
+	}
+	
+	public int getDimensionX(int n) {
+		if (n >= mData.size())
+			return 0;
+		
+		Vector<Point> temp = new Vector<Point>(0);
+		mData.get(n).getPoints(temp);
+		if (temp.isEmpty())
+			return 0;
+	
+		Point minp, maxp;
+		minp = maxp = temp.get(0);
+		for (Point t: temp) {
+			if (t.x >= maxp.x) maxp.x = t.x;
+			if (t.x <= minp.x) minp.x = t.x;
+			if (t.y >= maxp.y) maxp.y = t.y;
+			if (t.y <= minp.y) minp.y = t.y;
+		}
+		return DataEngine.getDistance(maxp, minp);		
 	}
 	
 }

@@ -33,12 +33,10 @@ public class MainSq2D extends JFrame implements Runnable {
 	}
 	
 	public static void main(String[] args) {
-		String inFileName = new String("");
-		if (args.length > 0) inFileName = args[0];
-		
-		mModel = new DataModel(inFileName);
+		mModel = new DataModel();
 		mView = new DemoView(mModel);
-		mController = new DemoController(mModel, mView);
+		mController = new DemoController(mModel);
+		if (args.length > 0) mController.parse(args[0]);
 		
 		mMain = new MainSq2D();
 		mMain.start();
