@@ -18,6 +18,10 @@ public class DataModel {
 		return mData.size();
 	}
 	
+	public DataSet getData(int n) {
+		return mData.get(n);
+	}
+	
 	public int getDimensionX(int n) {
 		if (n >= mData.size())
 			return 0;

@@ -1,6 +1,8 @@
 package ua.luxoft.odessa.apushkar.sq2d.controller;
 
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
@@ -13,33 +15,39 @@ import javax.swing.JPanel;
 import ua.luxoft.odessa.apushkar.sq2d.model.impl.DataEngine;
 import ua.luxoft.odessa.apushkar.sq2d.model.impl.DataModel;
 import ua.luxoft.odessa.apushkar.sq2d.model.impl.DataSet;
+import ua.luxoft.odessa.apushkar.sq2d.view.impl.DemoView;
 
 public class DemoController extends JPanel {
 	private static final long serialVersionUID = 1L;
 	
 	private DataModel mModel;
-	private DataSet mDataSet;
+	private DemoView mView;
+	private DataEngine mEngine;
 	private JComboBox<Integer> mSelector;
 
-	public DemoController(DataModel model) {
+	public DemoController(DataModel model, DemoView view) {
 		mModel = model;
+		mView = view;
 		mSelector = new JComboBox<Integer>();
 	}
 	
 	public void createGUI() {
-		// fill selector with items
-		for (int i = 0; i < mModel.getCaseN(); i++)
-			mSelector.addItem(i+1);
-		this.setLayout(new BorderLayout(10, 10));
+		this.setLayout(new BorderLayout());
 		this.add(mSelector, BorderLayout.NORTH);
-		this.add(new JButton("RUN"), BorderLayout.WEST);
+		JButton runButton = new JButton("RUN");
+		this.add(runButton, BorderLayout.CENTER);
+		runButton.addActionListener(new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				if (mEngine == null)
+					startDemonstration(mSelector.getSelectedIndex());
+			}
+			
+		});
+		
 	}
-	
-	
-	public void startDemonstration(int n) {
-		DataEngine engine = new DataEngine(mDataSet);
-	}
-	
+
 	public void parse(String inFileName) {
 		if (!inFileName.isEmpty())
 			try {
@@ -48,7 +56,7 @@ public class DemoController extends JPanel {
 				Scanner scanner = new Scanner(buffer);
 
 				if (scanner.nextInt() > 0)
-				while (new Scanner(buffer).hasNext()) {
+				while (scanner.hasNext()) {
 					DataSet tempDS = new DataSet();
 					
 					int pointsN = scanner.nextInt();
@@ -63,11 +71,23 @@ public class DemoController extends JPanel {
 			catch (IOException ex) {
 				ex.printStackTrace();
 			}
+		fillSelector();
 	}
 	
+	private void fillSelector() {
+		// fill selector with items
+		for (int i = 0; i < mModel.getCaseN(); i++)
+			mSelector.addItem(i+1);
+		mSelector.invalidate();
+	}
+	
+	private void startDemonstration(int n) {
+		mEngine = new DataEngine(mModel.getData(n), mView);
+		mView.reset();
+		mEngine.checkCovered();
+		mEngine = null;
+	}
 
-	/**
-	 *  Private methods
-	 * */
+
 	
 }

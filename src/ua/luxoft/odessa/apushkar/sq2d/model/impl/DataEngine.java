@@ -1,30 +1,53 @@
 package ua.luxoft.odessa.apushkar.sq2d.model.impl;
 
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
-public class DataEngine {
+import javax.swing.Timer;
+
+import ua.luxoft.odessa.apushkar.sq2d.api.IPointsObserver;
+import ua.luxoft.odessa.apushkar.sq2d.view.impl.DemoView;
+
+public class DataEngine implements ActionListener {
 	private DataSet mDataSet;
 	private Vector<Integer> mDistance;
+	private IPointsObserver mPointObserver;
+	private Timer mTimer;
 	
-	public DataEngine(DataSet data) {
+	public DataEngine(DataSet data, DemoView observer) {
 		mDataSet = data;
 		mDistance = new Vector<Integer>(0);
+		mPointObserver = observer;
+		mTimer = null;
 	}
 	
 	public void checkCovered() {
+		mTimer = new Timer(500, this);
+		mTimer.start();
 		Vector<Point> v = new Vector<Point>(0);
 		mDataSet.getPoints(v);
 		
 		sortByDistance();
-
-		// TODO: should notify about changes
+		mPointObserver.notify(v);
+	}
+	
+	@Override
+	public void actionPerformed(ActionEvent e) {
+		Vector<Point> v = new Vector<Point>(0);
+		mDataSet.getPoints(v);
 		for (int d: mDistance)
-			if (isCoveredW(v, d) || isCoveredH(v, d)) 
-				break;
+			if (isCoveredW(v, d) || isCoveredH(v, d)) { 
+				mTimer.stop(); 
+			}		
+	}
+	
+	public boolean isBusy() {
+		return mTimer.isRunning();
 	}
 	
 	static public int getDistance(Point a, Point b) {
@@ -58,7 +81,7 @@ public class DataEngine {
 		Vector<Point> temp = new Vector<Point>(p);
 		temp.add(a);
 		Point minp, maxp;
-		minp = maxp = a;
+		minp = maxp = new Point(a.x, a.y);
 		for (Point t: temp) {
 			if (t.x >= maxp.x) maxp.x = t.x;
 			if (t.x <= minp.x) minp.x = t.x;
@@ -104,13 +127,14 @@ public class DataEngine {
 					if (getBound(ep, vv.get(j)) <= side) {
 						sq_found = true;
 						ep.add(vv.get(j));
-						// TODO: inform view about points to remove.
 					}						
 				}
 			}
 			
 			if (sq_found) {
 				asq++;
+				
+				mPointObserver.notifyForRemove(ep);
 				for (Point p: ep) {
 					vv.remove(p);
 					amountf++;
@@ -134,5 +158,7 @@ public class DataEngine {
 		java.util.Collections.sort(vv, new PointComparatorY());
 		return isCoveredAnyway(vv, side);
 	}
+
+
 	
 }
