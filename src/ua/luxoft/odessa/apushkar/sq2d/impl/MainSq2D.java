@@ -33,7 +33,7 @@ public class MainSq2D extends JFrame implements Runnable {
 		mView.createGUI();
 		
 		mMainWindow.getContentPane().add(mMainPanel);
-		mMainWindow.setMinimumSize(new Dimension(400, 300));
+		mMainWindow.setMinimumSize(new Dimension(400, 400));
 		mMainWindow.setMaximumSize(new Dimension(1000, 800));
 		mMainWindow.pack();
 		mMainWindow.setResizable(true);

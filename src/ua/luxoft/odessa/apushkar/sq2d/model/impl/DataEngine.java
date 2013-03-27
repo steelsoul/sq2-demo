@@ -28,22 +28,23 @@ public class DataEngine implements ActionListener {
 	
 	public void checkCovered() {
 		mTimer = new Timer(500, this);
-		mTimer.start();
 		Vector<Point> v = new Vector<Point>(0);
-		mDataSet.getPoints(v);
-		
+		mDataSet.getPoints(v);		
 		sortByDistance();
 		mPointObserver.notify(v);
+		mTimer.start();
 	}
 	
 	@Override
 	public void actionPerformed(ActionEvent e) {
 		Vector<Point> v = new Vector<Point>(0);
 		mDataSet.getPoints(v);
-		for (int d: mDistance)
-			if (isCoveredW(v, d) || isCoveredH(v, d)) { 
-				mTimer.stop(); 
-			}		
+		for (int d: mDistance) {
+			if (isCoveredW(v, d) || isCoveredH(v, d)) {
+				mTimer.stop();
+				break;
+			}
+		}
 	}
 	
 	public boolean isBusy() {
@@ -81,7 +82,8 @@ public class DataEngine implements ActionListener {
 		Vector<Point> temp = new Vector<Point>(p);
 		temp.add(a);
 		Point minp, maxp;
-		minp = maxp = new Point(a.x, a.y);
+		minp = new Point(a.x, a.y);
+		maxp = new Point(a.x, a.y);
 		for (Point t: temp) {
 			if (t.x >= maxp.x) maxp.x = t.x;
 			if (t.x <= minp.x) minp.x = t.x;
@@ -113,13 +115,14 @@ public class DataEngine implements ActionListener {
 		int iteration = 0;
 		int asq = 0;
 		int amountf = 0;
-		
+		mPointObserver.notifyEraseRP();
 		for (;;) {
 			ep.clear();
+			
 			if (vv.size() + asq <= mDataSet.getSquaresN()) return true;
 			
 			if (iteration + 1 >= vv.size()) return false;
-			
+						
 			boolean sq_found = false;
 			for (int j = iteration + 1; j < vv.size(); j++) {
 				if (getDistance(vv.get(iteration), vv.get(j)) <= side) {
@@ -132,18 +135,21 @@ public class DataEngine implements ActionListener {
 			}
 			
 			if (sq_found) {
-				asq++;
-				
-				mPointObserver.notifyForRemove(ep);
+				asq++;				
+				mPointObserver.notifyForRemove(ep, side);
 				for (Point p: ep) {
 					vv.remove(p);
 					amountf++;
 				}
-				if (asq > mDataSet.getSquaresN()) return false;
+				if (asq > mDataSet.getSquaresN()) { 
+					return false;
+				}
 				if (amountf >= mDataSet.getPointsN()) return true;					
 			}
 			else
+			{
 				iteration++;
+			}
 		}
 	}
 	

@@ -32,8 +32,7 @@ public class DataSet {
 	
 	public void getPoints(Vector<Point> p) {
 		p.clear();
-		for (Point a: mPoints)
-			p.add(a);			
+		p.addAll(mPoints);
 	}
 	
 	public Point getPoint(int n) {

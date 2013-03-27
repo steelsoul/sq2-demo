@@ -34,8 +34,13 @@ public class DemoView extends JPanel implements IPointsObserver {
 	}
 
 	@Override
-	public void notifyForRemove(Vector<Point> p) {
-		mCanvas.setRemovePoints(p);		
+	public void notifyForRemove(Vector<Point> p, int side) {
+		mCanvas.setRemovePoints(p, side);		
+	}
+
+	@Override
+	public void notifyEraseRP() {
+		mCanvas.eraseRemoved();		
 	}
 
 
