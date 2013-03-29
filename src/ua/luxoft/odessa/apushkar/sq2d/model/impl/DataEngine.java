@@ -1,54 +1,45 @@
 package ua.luxoft.odessa.apushkar.sq2d.model.impl;
 
 import java.awt.Point;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.Set;
 import java.util.Vector;
 
-import javax.swing.Timer;
-
 import ua.luxoft.odessa.apushkar.sq2d.api.IPointsObserver;
 import ua.luxoft.odessa.apushkar.sq2d.view.impl.DemoView;
 
-public class DataEngine implements ActionListener {
+public class DataEngine extends Thread {
 	private DataSet mDataSet;
 	private Vector<Integer> mDistance;
 	private IPointsObserver mPointObserver;
-	private Timer mTimer;
+	private boolean isRunning;
 	
 	public DataEngine(DataSet data, DemoView observer) {
 		mDataSet = data;
 		mDistance = new Vector<Integer>(0);
 		mPointObserver = observer;
-		mTimer = null;
+		isRunning = true;
 	}
 	
-	public void checkCovered() {
-		mTimer = new Timer(500, this);
+	public boolean isRunning() {
+		return isRunning;
+	}
+	
+	public void stopEngine() {
+		isRunning = false;
+	}
+	
+	private void checkCovered() {
 		Vector<Point> v = new Vector<Point>(0);
 		mDataSet.getPoints(v);		
 		sortByDistance();
 		mPointObserver.notify(v);
-		mTimer.start();
-	}
-	
-	@Override
-	public void actionPerformed(ActionEvent e) {
-		Vector<Point> v = new Vector<Point>(0);
-		mDataSet.getPoints(v);
+		
 		for (int d: mDistance) {
-			if (isCoveredW(v, d) || isCoveredH(v, d)) {
-				mTimer.stop();
-				break;
-			}
+			if (!isRunning) break;
+			if (isCoveredW(v, d) || isCoveredH(v, d)) break;			
 		}
-	}
-	
-	public boolean isBusy() {
-		return mTimer.isRunning();
 	}
 	
 	static public int getDistance(Point a, Point b) {
@@ -115,6 +106,16 @@ public class DataEngine implements ActionListener {
 		int iteration = 0;
 		int asq = 0;
 		int amountf = 0;
+		
+		synchronized (this) {
+			try {
+				this.wait(100);
+			} catch (InterruptedException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		}
+		
 		mPointObserver.notifyEraseRP();
 		for (;;) {
 			ep.clear();
@@ -163,6 +164,11 @@ public class DataEngine implements ActionListener {
 		Vector<Point> vv = new Vector<Point>(v);
 		java.util.Collections.sort(vv, new PointComparatorY());
 		return isCoveredAnyway(vv, side);
+	}
+
+	@Override
+	public void run() {
+		checkCovered();
 	}
 
 

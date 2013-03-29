@@ -29,6 +29,7 @@ public class DemoController extends JPanel {
 		mModel = model;
 		mView = view;
 		mSelector = new JComboBox<Integer>();
+		mEngine = null;
 	}
 	
 	public void createGUI() {
@@ -39,9 +40,8 @@ public class DemoController extends JPanel {
 		runButton.addActionListener(new ActionListener() {
 
 			@Override
-			public void actionPerformed(ActionEvent e) {
-				if (mEngine == null)
-					startDemonstration(mSelector.getSelectedIndex());
+			public void actionPerformed(ActionEvent e) {				
+				startDemonstration(mSelector.getSelectedIndex());
 			}
 			
 		});
@@ -82,10 +82,28 @@ public class DemoController extends JPanel {
 	}
 	
 	private void startDemonstration(int n) {
-		mEngine = new DataEngine(mModel.getData(n), mView);
-		mView.reset();
-		mEngine.checkCovered();
-		mEngine = null;
+		if (mEngine != null) {
+			mEngine.stopEngine();
+			
+			try {
+				mEngine.join(200);
+			}
+			catch (InterruptedException ex) {
+				ex.printStackTrace();
+			}
+				
+//				mEngine.isAlive());
+			
+			mEngine = null;
+			mView.reset();
+			mEngine = new DataEngine(mModel.getData(n), mView);
+			mEngine.start();
+		} else
+		{
+			mView.reset();
+			mEngine = new DataEngine(mModel.getData(n), mView);
+			mEngine.start();
+		}
 	}
 
 
